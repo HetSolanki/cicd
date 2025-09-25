@@ -1,29 +1,34 @@
-import { IncomingHttpHeaders } from "http";
-import { getAPIKey } from "src/api/auth";
 import { describe, expect, test } from "vitest";
+import { getAPIKey } from "../api/auth";
 
-const headers: IncomingHttpHeaders = {
-  "content-type": "application/json",
-  authorization: "Bearer abc123",
-  accept: "application/json",
-  "x-custom-header": undefined,
-};
-
-const headers2: IncomingHttpHeaders = {
-  "content-type": "application/json",
-  authorization: "ApiKey abc123",
-  accept: "application/json",
-  "x-custom-header": undefined,
-};
-
-const apiKey1 = getAPIKey(headers);
-const apiKey2 = getAPIKey(headers2);
-
-describe("test getAPIKey function", () => {
-  test("apiKey response", () => {
-    expect(apiKey1).toBeNull();
+describe("getAPIKey", () => {
+  test("should return null if the authorization header is not present", () => {
+    const headers = {};
+    const result = getAPIKey(headers);
+    expect(result).toBeNull();
   });
-  test("apiKey response not to be null", () => {
-    expect(apiKey2).not.toBeNull();
+
+  test("should return null if the authorization header does not start with 'ApiKey'", () => {
+    const headers = {
+      authorization: "Bearer my-token",
+    };
+    const result = getAPIKey(headers);
+    expect(result).toBeNull();
+  });
+
+  test("should return null if the authorization header is malformed", () => {
+    const headers = {
+      authorization: "ApiKey",
+    };
+    const result = getAPIKey(headers);
+    expect(result).toBeNull();
+  });
+
+  test("should return the API key if the authorization header is valid", () => {
+    const headers = {
+      authorization: "ApiKey valid-api-key",
+    };
+    const result = getAPIKey(headers);
+    expect(result).toBe("valid-api-key");
   });
 });
