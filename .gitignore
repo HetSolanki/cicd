@@ -3,3 +3,5 @@ coverage/
 dist/
 .env
 .vscode
+google-cloud-sdk
+notely-473817-c9d02be5d82c.json
